@@ -1,8 +1,7 @@
 django==5.2
-djangorestframework
+djangorestframework==3.16.1
+djangorestframework_simplejwt==5.5.1
 psycopg2-binary
 drf-spectacular
-uvicorn==0.30.1
-django-ninja==1.4.1
 sqlparse==0.5.3
 django-extensions==4.1
