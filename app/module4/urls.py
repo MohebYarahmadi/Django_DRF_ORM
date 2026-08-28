@@ -22,7 +22,6 @@ for name, cls in getmembers(views, isclass):
             rf"{name.lower().replace('viewset', '')}", cls, basename=name.lower()
         )
 
-
 urlpatterns = [
     path("api/mod4/", include(router.urls)),  # Register the routes under '/api/m4'
 ]
