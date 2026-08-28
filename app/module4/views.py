@@ -40,7 +40,7 @@ class CategoryViewSet(ViewSet):
             responses={
                 201: CategorySerializer,
             },  # Expected response will be the created category
-            tags=["Module 4"],
+            tags=["Module 4 - Category"],
     )
     # override the create action
     def create(self, request):
@@ -60,7 +60,7 @@ class CategoryViewSet(ViewSet):
         responses={
             200: CategorySerializer
         },  # Expected response will be the created category
-        tags=["Module 4"],
+        tags=["Module 4 - Category"],
     )
     def update(self, request, pk=None):
         try:
@@ -84,7 +84,7 @@ class CategoryBulkViewSet(ViewSet):
         responses={
             201: CategorySerializer(many=True)
         }, # Returns multiple inserted bojects
-        tags=['Module 4'],
+        tags=['Module 4 - Category'],
     )
     def create(self, request):
         # Ensure request contains a list of items
@@ -126,9 +126,8 @@ class ProductViewSet(ViewSet):
         responses={
             201: ProductSerializerOut
         },
-        tags=["Module 4"],
+        tags=["Module 4 - Product"],
     )
-
     def create(self, request):
         serializer = ProductSerializerIn(data=request.data)
 
@@ -141,13 +140,36 @@ class ProductViewSet(ViewSet):
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
 
+    @extend_schema(
+        request=ProductSerializerIn,
+        responses={
+            200: ProductSerializerIn
+        },
+        tags=['Module 4 - Product'],
+    )
+    def update(self, request, pk=None):
+        try:
+            product = Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            return Response(
+                {'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = ProductSerializerIn(product, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class ProductBulkViewSet(ViewSet):
     @extend_schema(
         request=ProductSerializerIn(many=True),
         responses={
             201: ProductSerializerIn(many=True)
         },
-        tags=['Module 4'],
+        tags=['Module 4 - Product'],
     )
     def create(self, request):
         if not isinstance(request.data, list):
