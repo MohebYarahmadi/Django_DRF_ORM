@@ -5,36 +5,25 @@ from rest_framework.viewsets import ViewSet
 from drf_spectacular.utils import extend_schema
 
 from .serializers import (
-    CategorySerializer, InventoryCategorySerializer,
-    ProductSerializerIn, ProductSerializerOut
+    CategorySerializer, ProductSerializerIn, ProductSerializerOut
 )
-
-# # Use ModelViewSet
-# class InventoryCategoryModelViewSet(ModelViewSet):
-#     queryset = Category.objects.all()  # fetch all categories
-#     serializer_class = InventoryCategorySerializer  # use the serializer
-
-
-# Use ViewSet
-class InventoryCategoryViewSet(ViewSet):
-    def list(self, request):
-        queryset = Category.objects.all()
-        serializer = InventoryCategorySerializer(queryset, many=True)
-        return Response(serializer.data)
-
-
-class InventoryProductViewSet(ViewSet):
-    def list(self, reuqest):
-        queryset = Product.objects.all()
-        serializer = ProductSerializerIn(queryset, many=True)
-        return Response(serializer.data)
-
 
 #region CATEGORY
 # ========================================
 # Inserting Data with create() and save()
 # ========================================
 class CategoryViewSet(ViewSet):
+    @extend_schema(
+            request=CategorySerializer,
+            responses={200: CategorySerializer},
+            tags=["Module 4 - Category"],
+    )
+    def list(self, request):
+        queryset = Category.objects.all()
+        serializer = CategorySerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
     @extend_schema(
             request=CategorySerializer, # This links the serializer for the request body
             responses={
@@ -121,6 +110,17 @@ class CategoryBulkViewSet(ViewSet):
 # Inserting Data with create() and save()
 # ========================================
 class ProductViewSet(ViewSet):
+    @extend_schema(
+            request=ProductSerializerOut,
+            responses={200: ProductSerializerOut},
+            tags=["Module 4 - Product"],
+    )
+    def list(self, request):
+        queryset = Product.objects.all()
+        serializer = ProductSerializerOut(queryset, many=True)
+        return Response(serializer.data)
+
+
     @extend_schema(
         request=ProductSerializerIn,
         responses={
