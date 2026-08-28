@@ -67,6 +67,30 @@ class CategoryViewSet(ViewSet):
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
+
+    @extend_schema(
+    request=CategorySerializer, # This links the serializer for the request body
+    responses={
+        200: CategorySerializer
+    },  # Expected response will be the created category
+    tags=["Module 4 - Category"],
+    )
+    def partial_update(self, request, pk=None):
+        try:
+            category = Category.objects.get(pk=pk)  # fetch the existing record
+        except Category.DoesNotExist:
+            return Response(
+                {'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = CategorySerializer(category, data=request.data, partial=True)    # Validate data
+
+        if serializer.is_valid():
+            serializer.save()   # Update the record
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+
 class CategoryBulkViewSet(ViewSet):
     @extend_schema(
         request=CategorySerializer(many=True),
@@ -156,6 +180,30 @@ class ProductViewSet(ViewSet):
             )
 
         serializer = ProductSerializerIn(product, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @extend_schema(
+        request=ProductSerializerIn,
+        responses={
+            200: ProductSerializerIn
+        },
+        tags=['Module 4 - Product'],
+    )
+    def partial_update(self, request, pk=None):
+        try:
+            product = Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            return Response(
+                {'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = ProductSerializerIn(product, data=request.data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
