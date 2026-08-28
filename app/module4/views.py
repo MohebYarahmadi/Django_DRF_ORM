@@ -84,11 +84,11 @@ class CategoryBulkViewSet(ViewSet):
             # Serialize the created objects and return response
             return Response(
                 CategorySerializer(created_categories, many=True).data,
-                status=status.HTTP_201_CREATED,
+                status = status.HTTP_201_CREATED,
             )
         else:
             # Return validation errors
-            return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 #endregion CATEGORY
@@ -116,5 +116,32 @@ class ProductViewSet(ViewSet):
             return Response(return_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductBulkViewSet(ViewSet):
+    @extend_schema(
+        request=ProductSerializerIn(many=True),
+        responses={
+            201: ProductSerializerIn(many=True)
+        },
+        tags=['Module 4'],
+    )
+    def create(self, request):
+        if not isinstance(request.data, list):
+            return Response(
+                {'error': 'Expected a list of objects'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = ProductSerializerIn(data=request.data, many=True)
+
+        if serializer.is_valid():
+            products = [Product(**item) for item in serializer.validated_data]
+            created_products = Product.objects.bulk_create(products)
+            return Response(
+                status = status.HTTP_201_CREATED,
+            )
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #endregion PRODUCT
