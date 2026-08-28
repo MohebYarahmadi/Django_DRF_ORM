@@ -38,7 +38,7 @@ class CategoryViewSet(ViewSet):
     @extend_schema(
             request=CategorySerializer, # This links the serializer for the request body
             responses={
-                201: CategorySerializer
+                201: CategorySerializer,
             },  # Expected response will be the created category
             tags=["Module 4"],
     )
@@ -54,6 +54,29 @@ class CategoryViewSet(ViewSet):
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
+
+    @extend_schema(
+        request=CategorySerializer, # This links the serializer for the request body
+        responses={
+            200: CategorySerializer
+        },  # Expected response will be the created category
+        tags=["Module 4"],
+    )
+    def update(self, request, pk=None):
+        try:
+            category = Category.objects.get(pk=pk)  # fetch the existing record
+        except Category.DoesNotExist:
+            return Response(
+                {'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = CategorySerializer(category, data=request.data)    # Validate data
+
+        if serializer.is_valid():
+            serializer.save()   # Update the record
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
 class CategoryBulkViewSet(ViewSet):
     @extend_schema(
