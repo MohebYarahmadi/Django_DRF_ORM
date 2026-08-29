@@ -17,9 +17,11 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializerIn(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ["id", 'name', 'slug', 'description', 'price', 'is_digital', 'is_active']
+        fields = ["id", 'name', 'slug', 'description',
+                  'price', 'is_digital', 'is_active', 'category']
+
 
 class ProductSerializerOut(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'name', 'slug']
+        fields = ['id', 'name', 'slug', 'category']

@@ -1,3 +1,4 @@
+# region IMPORTS
 from inventory.models import Category, Product
 from rest_framework import status
 from rest_framework.response import Response
@@ -7,29 +8,31 @@ from drf_spectacular.utils import extend_schema
 from .serializers import (
     CategorySerializer, ProductSerializerIn, ProductSerializerOut
 )
+# endregion IMPORTS
 
-#region CATEGORY
+# region CATEGORY
 # ========================================
-# Inserting Data with create() and save()
+# ViewSet
 # ========================================
+
+
 class CategoryViewSet(ViewSet):
     @extend_schema(
-            request=CategorySerializer,
-            responses={200: CategorySerializer},
-            tags=["Module 4 - Category"],
+        request=CategorySerializer,
+        responses={200: CategorySerializer},
+        tags=["Module 4 - Category"],
     )
     def list(self, request):
         queryset = Category.objects.all()
         serializer = CategorySerializer(queryset, many=True)
         return Response(serializer.data)
 
-
     @extend_schema(
-            request=CategorySerializer, # This links the serializer for the request body
-            responses={
-                201: CategorySerializer,
-            },  # Expected response will be the created category
-            tags=["Module 4 - Category"],
+        request=CategorySerializer,  # This links the serializer for the request body
+        responses={
+            201: CategorySerializer,
+        },  # Expected response will be the created category
+        tags=["Module 4 - Category"],
     )
     # override the create action
     def create(self, request):
@@ -43,9 +46,8 @@ class CategoryViewSet(ViewSet):
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
-
     @extend_schema(
-        request=CategorySerializer, # This links the serializer for the request body
+        request=CategorySerializer,  # This links the serializer for the request body
         responses={
             200: CategorySerializer
         },  # Expected response will be the created category
@@ -59,7 +61,8 @@ class CategoryViewSet(ViewSet):
                 {'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND
             )
 
-        serializer = CategorySerializer(category, data=request.data)    # Validate data
+        serializer = CategorySerializer(
+            category, data=request.data)    # Validate data
 
         if serializer.is_valid():
             serializer.save()   # Update the record
@@ -67,13 +70,12 @@ class CategoryViewSet(ViewSet):
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
-
     @extend_schema(
-    request=CategorySerializer, # This links the serializer for the request body
-    responses={
-        200: CategorySerializer
-    },  # Expected response will be the created category
-    tags=["Module 4 - Category"],
+        request=CategorySerializer,  # This links the serializer for the request body
+        responses={
+            200: CategorySerializer
+        },  # Expected response will be the created category
+        tags=["Module 4 - Category"],
     )
     def partial_update(self, request, pk=None):
         try:
@@ -83,7 +85,8 @@ class CategoryViewSet(ViewSet):
                 {'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND
             )
 
-        serializer = CategorySerializer(category, data=request.data, partial=True)    # Validate data
+        serializer = CategorySerializer(
+            category, data=request.data, partial=True)    # Validate data
 
         if serializer.is_valid():
             serializer.save()   # Update the record
@@ -91,12 +94,13 @@ class CategoryViewSet(ViewSet):
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
+
 class CategoryBulkViewSet(ViewSet):
     @extend_schema(
         request=CategorySerializer(many=True),
         responses={
             201: CategorySerializer(many=True)
-        }, # Returns multiple inserted bojects
+        },  # Returns multiple inserted bojects
         tags=['Module 4 - Category'],
     )
     def create(self, request):
@@ -112,7 +116,8 @@ class CategoryBulkViewSet(ViewSet):
 
         if serializer.is_valid():
             # Convert validated data to model instances without saving yet
-            categories = [Category(**item) for item in serializer.validated_data]
+            categories = [Category(**item)
+                          for item in serializer.validated_data]
 
             # Use bulk_create() to insert all at once
             created_categories = Category.objects.bulk_create(categories)
@@ -120,30 +125,29 @@ class CategoryBulkViewSet(ViewSet):
             # Serialize the created objects and return response
             return Response(
                 CategorySerializer(created_categories, many=True).data,
-                status = status.HTTP_201_CREATED,
+                status=status.HTTP_201_CREATED,
             )
         else:
             # Return validation errors
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-#endregion CATEGORY
+# endregion CATEGORY
 
-#region PRODUCT
+# region PRODUCT
 # ========================================
 # Inserting Data with create() and save()
 # ========================================
 class ProductViewSet(ViewSet):
     @extend_schema(
-            request=ProductSerializerOut,
-            responses={200: ProductSerializerOut},
-            tags=["Module 4 - Product"],
+        request=ProductSerializerOut,
+        responses={200: ProductSerializerOut},
+        tags=["Module 4 - Product"],
     )
     def list(self, request):
         queryset = Product.objects.all()
         serializer = ProductSerializerOut(queryset, many=True)
         return Response(serializer.data)
-
 
     @extend_schema(
         request=ProductSerializerIn,
@@ -162,7 +166,6 @@ class ProductViewSet(ViewSet):
             return Response(return_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
-
 
     @extend_schema(
         request=ProductSerializerIn,
@@ -187,7 +190,6 @@ class ProductViewSet(ViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     @extend_schema(
         request=ProductSerializerIn,
         responses={
@@ -203,13 +205,15 @@ class ProductViewSet(ViewSet):
                 {'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND
             )
 
-        serializer = ProductSerializerIn(product, data=request.data, partial=True)
+        serializer = ProductSerializerIn(
+            product, data=request.data, partial=True)
 
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ProductBulkViewSet(ViewSet):
     @extend_schema(
@@ -232,9 +236,9 @@ class ProductBulkViewSet(ViewSet):
             products = [Product(**item) for item in serializer.validated_data]
             created_products = Product.objects.bulk_create(products)
             return Response(
-                status = status.HTTP_201_CREATED,
+                status=status.HTTP_201_CREATED,
             )
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#endregion PRODUCT
+# endregion PRODUCT
