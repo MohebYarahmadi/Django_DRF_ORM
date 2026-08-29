@@ -6,7 +6,8 @@ from rest_framework.viewsets import ViewSet
 from drf_spectacular.utils import extend_schema
 
 from .serializers import (
-    CategorySerializer, ProductSerializerIn, ProductSerializerOut
+    CategorySerializer, ProductSerializerIn, ProductSerializerOut,
+    ProductStockSerializer
 )
 # endregion IMPORTS
 
@@ -236,3 +237,23 @@ class ProductBulkViewSet(ViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # endregion PRODUCT
+
+# region PRODUCT_STOCK
+
+
+class ProductStockViewSet(ViewSet):
+    @extend_schema(
+        request=ProductStockSerializer,
+        responses={201: ProductStockSerializer},
+        tags=['Module 4 - ProductStock 1:1'],
+    )
+    def create(self, request):
+        # create a product
+
+        serializer = ProductStockSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# endregion PRODUCT_STOCK

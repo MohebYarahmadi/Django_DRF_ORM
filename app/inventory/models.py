@@ -3,7 +3,8 @@ from django.db import models
 
 # Category Model
 class Category(models.Model):
-    parent = models.ForeignKey("self", on_delete=models.RESTRICT, null=True, blank=True)
+    parent = models.ForeignKey(
+        "self", on_delete=models.RESTRICT, null=True, blank=True)
     name = models.CharField(max_length=50, unique=True)
     slug = models.SlugField(max_length=55, unique=True)
     is_active = models.BooleanField(default=False)
@@ -43,7 +44,8 @@ class Product(models.Model):
 # Product Promotion Event Model
 class ProductPromotionEvent(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    promotion_event = models.ForeignKey(PromotionEvent, on_delete=models.CASCADE)
+    promotion_event = models.ForeignKey(
+        PromotionEvent, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ("product", "promotion_event")
@@ -54,9 +56,10 @@ class ProductPromotionEvent(models.Model):
 
 # Stock Management Model
 class StockManagement(models.Model):
-    product = models.OneToOneField(Product, on_delete=models.CASCADE, unique=True)
+    product = models.OneToOneField(
+        Product, on_delete=models.CASCADE, unique=True)
     quantity = models.IntegerField(default=0)
-    last_checked_at = models.DateTimeField()
+    last_checked_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Stock for {self.product.name}"
