@@ -62,3 +62,20 @@ class ProductStockSerializer(serializers.ModelSerializer):
         StockManagement.objects.create(product=product, **stock_data)
 
         return product
+
+    def to_representation(self, instance):
+        """Customize the representation to include stock_data"""
+        # Start with the default representation
+        data = super().to_representation(instance)
+
+        # Fecth the related stock_data from the StockeManagement table
+        stock_instance = StockManagement.objects.filter(
+            product=instance).first()
+
+        # If stock_data exists, add it to the response
+        if stock_instance:
+            data['stock_data'] = StockManagementSerializer(stock_instance).data
+        else:
+            data['stock_data'] = None   # In case there's no related stock data
+
+        return data
