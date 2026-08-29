@@ -11,9 +11,6 @@ from .serializers import (
 # endregion IMPORTS
 
 # region CATEGORY
-# ========================================
-# ViewSet
-# ========================================
 
 
 class CategoryViewSet(ViewSet):
@@ -34,8 +31,7 @@ class CategoryViewSet(ViewSet):
         },  # Expected response will be the created category
         tags=["Module 4 - Category"],
     )
-    # override the create action
-    def create(self, request):
+    def create(self, request):  # override the create action
         # define serializer
         serializer = CategorySerializer(data=request.data)
 
@@ -131,13 +127,11 @@ class CategoryBulkViewSet(ViewSet):
             # Return validation errors
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 # endregion CATEGORY
 
 # region PRODUCT
-# ========================================
-# Inserting Data with create() and save()
-# ========================================
+
+
 class ProductViewSet(ViewSet):
     @extend_schema(
         request=ProductSerializerOut,
