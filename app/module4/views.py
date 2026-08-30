@@ -91,6 +91,24 @@ class CategoryViewSet(ViewSet):
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(tags=["Module 4 - Category"])
+    def destroy(self, request, pk=None):
+        """
+        Deletes a category.
+        """
+        try:
+            category = Category.objects.get(pk=pk)
+            category.delete()   # Deletes Order and related OrderProducts due to
+            return Response(
+                {'message': 'Category deleted successfully.'},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        except Category.DoesNotExist:
+            return Response(
+                {'error': 'Category not found!'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
 
 class CategoryBulkViewSet(ViewSet):
     @extend_schema(
