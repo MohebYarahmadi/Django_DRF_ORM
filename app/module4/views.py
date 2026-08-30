@@ -7,7 +7,7 @@ from drf_spectacular.utils import extend_schema
 
 from .serializers import (
     CategorySerializer, ProductSerializerIn, ProductSerializerOut,
-    ProductStockSerializer
+    ProductStockSerializer, OrderSerializer, UserSerializer
 )
 # endregion IMPORTS
 
@@ -257,3 +257,38 @@ class ProductStockViewSet(ViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 # endregion PRODUCT_STOCK
+
+
+# region ORDER
+class OrderViewSet(ViewSet):
+    @extend_schema(
+        request=OrderSerializer,
+        responses={201: OrderSerializer},
+        tags=['Module 4 - Order'],
+    )
+    def create(self, request):
+        serializer = OrderSerializer(data=request.data)
+
+        if serializer.is_valid():
+            order = serializer.save()
+            return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# endregion ORDER
+
+
+# region USER
+class CreateUserViewSet(ViewSet):
+    @extend_schema(
+        request=UserSerializer,
+        tags=['Moduler 4 - User'],
+    )
+    def create(self, request):
+        serializer = UserSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# endregion
