@@ -1,4 +1,4 @@
-from inventory.models import Category, Product, StockManagement
+from inventory.models import Category, Product, StockManagement, Order, User, OrderProduct
 from rest_framework import serializers
 
 
@@ -79,3 +79,43 @@ class ProductStockSerializer(serializers.ModelSerializer):
             data['stock_data'] = None   # In case there's no related stock data
 
         return data
+
+
+class OrderProductSerializer(serializers.ModelSerializer):
+    """Handles individual product entries within an order"""
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all())
+
+    class Meta:
+        model = OrderProduct
+        fields = ['product', 'quantity']
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    """Handles order creation with multiple products"""
+    products = OrderProductSerializer(
+        many=True,
+        write_only=True
+    )   # Accept a list of products
+
+    class Meta:
+        model = Order
+        fields = ['user', 'created_at', 'updated_at', 'products']
+
+    def create(self, validated_data):
+        products_data = validated_data.pop('products')   # Extract product list
+        order = Order.objects.create(**validated_data)  # Create the order
+
+        # Create OrderProduct entries for each product in the request
+        order_products = [
+            OrderProduct(order=order, **product_data) for product_data in products_data
+        ]
+        OrderProduct.objects.bulk_create(order_products)  # Bulk insert
+
+        return order
