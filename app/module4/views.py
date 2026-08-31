@@ -3,11 +3,13 @@ from inventory.models import Category, Product
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
+from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema
 
 from .serializers import (
     CategorySerializer, ProductSerializerIn, ProductSerializerOut,
-    ProductStockSerializer, OrderSerializer, UserSerializer
+    ProductStockSerializer, OrderSerializer, UserSerializer,
+    CategoryBulkSerializer,
 )
 # endregion IMPORTS
 
@@ -91,6 +93,24 @@ class CategoryViewSet(ViewSet):
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(tags=["Module 4 - Category"])
+    def destroy(self, request, pk=None):
+        """
+        Deletes a category.
+        """
+        try:
+            category = Category.objects.get(pk=pk)
+            category.delete()   # Deletes Order and related OrderProducts due to
+            return Response(
+                {'message': 'Category deleted successfully.'},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        except Category.DoesNotExist:
+            return Response(
+                {'error': 'Category not found!'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
 
 class CategoryBulkViewSet(ViewSet):
     @extend_schema(
@@ -127,6 +147,43 @@ class CategoryBulkViewSet(ViewSet):
         else:
             # Return validation errors
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(request=CategoryBulkSerializer, tags=['Module 4 - Category'])
+    @action(detail=False, methods=['post'], url_path='bulk-delete')
+    def bulk_delete(self, request):
+        """
+        Deletes multiple categories based on provided list of category IDs.
+        Request body should contain a list of category IDs.
+        """
+
+        # Extract the list of category IDs from the request body
+        serializer = CategoryBulkSerializer(data=request.data)
+
+        # Check if the serializer is valid
+        if serializer.is_valid():
+            category_ids = serializer.validated_data['ids']
+
+            if not category_ids:
+                return Response(
+                    {'error': 'No category IDs provided'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            # Perform the deletiong of the category
+            deleted_cout, _ = Category.objects.filter(
+                id__in=category_ids).delete()
+
+            # Return a response indicating how many categories were deleted
+            return Response(
+                {'message': f'{deleted_cout} categories deleted,'},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        else:
+            # Return validation error if serializer is not valid
+            return Response(
+                {'error': 'Invalid data', 'details': serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
 
 # endregion CATEGORY
 

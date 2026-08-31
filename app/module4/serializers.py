@@ -14,6 +14,14 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ["id", "parent", "name", "slug", "is_active", "level"]
 
 
+class CategoryBulkSerializer(serializers.Serializer):
+    ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=True,
+        help_text='List of product IDs to delete',
+    )
+
+
 class ProductSerializerIn(serializers.ModelSerializer):
     class Meta:
         model = Product
