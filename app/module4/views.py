@@ -1,5 +1,5 @@
 # region IMPORTS
-from inventory.models import Category, Product
+from inventory.models import Category, Product, Order, Product, User
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
@@ -12,6 +12,7 @@ from .serializers import (
     CategoryBulkSerializer,
 )
 # endregion IMPORTS
+
 
 # region CATEGORY
 
@@ -187,6 +188,7 @@ class CategoryBulkViewSet(ViewSet):
 
 # endregion CATEGORY
 
+
 # region PRODUCT
 
 
@@ -295,6 +297,7 @@ class ProductBulkViewSet(ViewSet):
 
 # endregion PRODUCT
 
+
 # region PRODUCT_STOCK
 
 
@@ -320,6 +323,16 @@ class ProductStockViewSet(ViewSet):
 class OrderViewSet(ViewSet):
     @extend_schema(
         request=OrderSerializer,
+        responses={200: OrderSerializer},
+        tags=['Module 4 - Order'],
+    )
+    def list(self, request):
+        queryset = Order.objects.all()
+        serialize = OrderSerializer(queryset, many=True)
+        return Response(serialize.data)
+
+    @extend_schema(
+        request=OrderSerializer,
         responses={201: OrderSerializer},
         tags=['Module 4 - Order'],
     )
@@ -331,11 +344,65 @@ class OrderViewSet(ViewSet):
             return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        request=OrderSerializer,
+        responses={200: OrderSerializer},
+        tags=['Module 4 - Order'],
+    )
+    def update(self, request, pk=None):
+        try:
+            order = Order.objects.get(pk=pk)
+        except Order.DoesNotExist:
+            return Response(
+                {'error': 'Order not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = OrderSerializer(order, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        request=OrderSerializer,
+        responses={200: OrderSerializer},
+        tags=['Module 4 - Order'],
+    )
+    def partial_update(self, request, pk=None):
+        try:
+            order = Order.objects.get(pk=pk)
+        except Order.DoesNotExist:
+            return Response(
+                {'error': 'Order not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = OrderSerializer(order, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 # endregion ORDER
 
 
 # region USER
 class CreateUserViewSet(ViewSet):
+    @extend_schema(
+        request=UserSerializer,
+        responses={200: UserSerializer},
+        tags=['Moduler 4 - User'],
+    )
+    def list(self, request):
+        queryset = User.objects.all()
+        serializer = UserSerializer(queryset, many=True)
+        return Response(serializer.data)
+
     @extend_schema(
         request=UserSerializer,
         tags=['Moduler 4 - User'],
