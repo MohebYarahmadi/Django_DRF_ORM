@@ -18,11 +18,19 @@ from .serializers import (
 
 
 class CategoryViewSet(ViewSet):
+    # @extend_schema(
+    #     tags=["Module 5 - Category"],
+    # )
+    # def list(self, request):
+    #     queryset = Category.objects.all()
+    #     serializer = CategorySerializer(queryset, many=True)
+    #     return Response(serializer.data)
+
     @extend_schema(
         tags=["Module 5 - Category"],
     )
     def list(self, request):
-        queryset = Category.objects.all()
+        queryset = Category.objects.values('name', 'slug')
         serializer = CategorySerializer(queryset, many=True)
         return Response(serializer.data)
 
