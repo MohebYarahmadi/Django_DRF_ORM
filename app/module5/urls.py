@@ -1,0 +1,28 @@
+from inspect import getmembers, isclass
+
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+from rest_framework.viewsets import ViewSet
+
+from . import views
+
+# initiate default router
+router = DefaultRouter()
+
+# extend and add new router paths
+# router.register(r"inventory-category", InventoryCategoryModelViewSet)
+# router.register(
+#     r"inventory-category", views.InventoryCategoryViewSet, basename="inventory-category"
+# )
+
+# Automatically find all ViewSets in views.py and register them
+for name, cls in getmembers(views, isclass):
+    if issubclass(cls, ViewSet) and cls.__module__ == views.__name__:
+        router.register(
+            rf"{name.lower().replace('viewset', '')}", cls, basename=name.lower()
+        )
+
+urlpatterns = [
+    # Register the routes under '/api/m5'
+    path("api/mod5/", include(router.urls)),
+]

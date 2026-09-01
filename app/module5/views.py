@@ -18,13 +18,19 @@ from .serializers import (
 
 
 class CategoryViewSet(ViewSet):
+    # @extend_schema(
+    #     tags=["Module 5 - Category"],
+    # )
+    # def list(self, request):
+    #     queryset = Category.objects.all()
+    #     serializer = CategorySerializer(queryset, many=True)
+    #     return Response(serializer.data)
+
     @extend_schema(
-        request=CategorySerializer,
-        responses={200: CategorySerializer},
-        tags=["Module 4 - Category"],
+        tags=["Module 5 - Category"],
     )
     def list(self, request):
-        queryset = Category.objects.all()
+        queryset = Category.objects.values('name', 'slug')
         serializer = CategorySerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -33,7 +39,7 @@ class CategoryViewSet(ViewSet):
         responses={
             201: CategorySerializer,
         },  # Expected response will be the created category
-        tags=["Module 4 - Category"],
+        tags=["Module 5 - Category"],
     )
     def create(self, request):  # override the create action
         # define serializer
@@ -51,7 +57,7 @@ class CategoryViewSet(ViewSet):
         responses={
             200: CategorySerializer
         },  # Expected response will be the created category
-        tags=["Module 4 - Category"],
+        tags=["Module 5 - Category"],
     )
     def update(self, request, pk=None):
         try:
@@ -75,7 +81,7 @@ class CategoryViewSet(ViewSet):
         responses={
             200: CategorySerializer
         },  # Expected response will be the created category
-        tags=["Module 4 - Category"],
+        tags=["Module 5 - Category"],
     )
     def partial_update(self, request, pk=None):
         try:
@@ -94,7 +100,7 @@ class CategoryViewSet(ViewSet):
         else:
             return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(tags=["Module 4 - Category"])
+    @extend_schema(tags=["Module 5 - Category"])
     def destroy(self, request, pk=None):
         """
         Deletes a category.
@@ -119,7 +125,7 @@ class CategoryBulkViewSet(ViewSet):
         responses={
             201: CategorySerializer(many=True)
         },  # Returns multiple inserted bojects
-        tags=['Module 4 - Category'],
+        tags=['Module 5 - Category'],
     )
     def create(self, request):
         # Ensure request contains a list of items
@@ -149,7 +155,7 @@ class CategoryBulkViewSet(ViewSet):
             # Return validation errors
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @extend_schema(request=CategoryBulkSerializer, tags=['Module 4 - Category'])
+    @extend_schema(request=CategoryBulkSerializer, tags=['Module 5 - Category'])
     @action(detail=False, methods=['post'], url_path='bulk-delete')
     def bulk_delete(self, request):
         """
@@ -196,7 +202,7 @@ class ProductViewSet(ViewSet):
     @extend_schema(
         request=ProductSerializerOut,
         responses={200: ProductSerializerOut},
-        tags=["Module 4 - Product"],
+        tags=["Module 5 - Product"],
     )
     def list(self, request):
         queryset = Product.objects.all()
@@ -208,7 +214,7 @@ class ProductViewSet(ViewSet):
         responses={
             201: ProductSerializerOut
         },
-        tags=["Module 4 - Product"],
+        tags=["Module 5 - Product"],
     )
     def create(self, request):
         serializer = ProductSerializerIn(data=request.data)
@@ -226,7 +232,7 @@ class ProductViewSet(ViewSet):
         responses={
             200: ProductSerializerIn
         },
-        tags=['Module 4 - Product'],
+        tags=['Module 5 - Product'],
     )
     def update(self, request, pk=None):
         try:
@@ -249,7 +255,7 @@ class ProductViewSet(ViewSet):
         responses={
             200: ProductSerializerIn
         },
-        tags=['Module 4 - Product'],
+        tags=['Module 5 - Product'],
     )
     def partial_update(self, request, pk=None):
         try:
@@ -275,7 +281,7 @@ class ProductBulkViewSet(ViewSet):
         responses={
             201: ProductSerializerIn(many=True)
         },
-        tags=['Module 4 - Product'],
+        tags=['Module 5 - Product'],
     )
     def create(self, request):
         if not isinstance(request.data, list):
@@ -305,7 +311,7 @@ class ProductStockViewSet(ViewSet):
     @extend_schema(
         request=ProductStockSerializer,
         responses={201: ProductStockSerializer},
-        tags=['Module 4 - ProductStock 1:1'],
+        tags=['Module 5 - ProductStock 1:1'],
     )
     def create(self, request):
         # create a product
@@ -324,7 +330,7 @@ class OrderViewSet(ViewSet):
     @extend_schema(
         request=OrderSerializer,
         responses={200: OrderSerializer},
-        tags=['Module 4 - Order'],
+        tags=['Module 5 - Order'],
     )
     def list(self, request):
         queryset = Order.objects.all()
@@ -334,7 +340,7 @@ class OrderViewSet(ViewSet):
     @extend_schema(
         request=OrderSerializer,
         responses={201: OrderSerializer},
-        tags=['Module 4 - Order'],
+        tags=['Module 5 - Order'],
     )
     def create(self, request):
         serializer = OrderSerializer(data=request.data)
@@ -348,7 +354,7 @@ class OrderViewSet(ViewSet):
     @extend_schema(
         request=OrderSerializer,
         responses={200: OrderSerializer},
-        tags=['Module 4 - Order'],
+        tags=['Module 5 - Order'],
     )
     def update(self, request, pk=None):
         try:
@@ -370,7 +376,7 @@ class OrderViewSet(ViewSet):
     @extend_schema(
         request=OrderSerializer,
         responses={200: OrderSerializer},
-        tags=['Module 4 - Order'],
+        tags=['Module 5 - Order'],
     )
     def partial_update(self, request, pk=None):
         try:

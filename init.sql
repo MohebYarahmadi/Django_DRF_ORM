@@ -62,3 +62,44 @@ CREATE TABLE inventory_orderproduct (
     product_id INTEGER NOT NULL REFERENCES inventory_product(id) ON DELETE CASCADE,
     quantity INTEGER NOT NULL
 );
+
+-- Load data into tables
+COPY inventory_category (id, parent_id, name, slug, is_active, level)
+FROM '/data/category.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY inventory_promotionevent (id, name, start_date, end_date, price_reduction)
+FROM '/data/promotionevent.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY inventory_product (id, category_id, name, slug, description, is_digital, is_active, created_at, updated_at, price)
+FROM '/data/product.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY inventory_productpromotionevent (id, product_id, promotion_event_id)
+FROM '/data/productpromotionevent.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY inventory_stockmanagement (id, product_id, quantity, last_checked_at)
+FROM '/data/stockmanagement.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY inventory_user (id, username, email, password)
+FROM '/data/user.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY inventory_order (id, user_id, created_at, updated_at)
+FROM '/data/order.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY inventory_orderproduct (id, order_id, product_id, quantity)
+FROM '/data/orderproduct.csv'
+DELIMITER ','
+CSV HEADER;
